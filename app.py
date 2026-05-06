@@ -6,7 +6,7 @@ from PIL import Image, ImageEnhance, ImageOps
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = "static"
+UPLOAD_FOLDER = "static/uploads"
 STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
