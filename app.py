@@ -1,22 +1,44 @@
 import os
 import requests
 from flask import Flask, render_template, request, jsonify
-from rembg import remove
+# from rembg import remove
 from PIL import Image, ImageEnhance, ImageOps
 
 app = Flask(__name__)
 
 UPLOAD_FOLDER = "static/uploads"
 STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
+REMOVE_BG_API_KEY = os.getenv("REMOVE_BG_API_KEY")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# def remove_background(image_path):
+#     """Remove background from image using rembg library."""
+#     output_path = image_path.replace(".", "_local.")
+#     with open(image_path, "rb") as i:
+#         with open(output_path, "wb") as o:
+#             o.write(remove(i.read()))
+#     return output_path
+
 def remove_background(image_path):
-    """Remove background from image using rembg library."""
-    output_path = image_path.replace(".", "_local.")
-    with open(image_path, "rb") as i:
-        with open(output_path, "wb") as o:
-            o.write(remove(i.read()))
-    return output_path
+    # try:
+    url = "https://api.remove.bg/v1.0/removebg"
+    with open(image_path, "rb") as img:
+        response = requests.post(
+            url,
+            files={"image_file": img},
+            data={"size": "auto"},
+            headers={"X-Api-Key": REMOVE_BG_API_KEY},
+            timeout=10
+        )
+    if response.status_code == 200:
+        output_path = os.path.join(UPLOAD_FOLDER, "no_bg.png")
+        with open(output_path, "wb") as out:
+            out.write(response.content)
+        return output_path
+    #     else:
+    #         return remove_bg_local(image_path)
+    # except:
+    #     return remove_bg_local(image_path)
 
 def enhance_local(image_path):
     """Apply comprehensive local image enhancements."""
